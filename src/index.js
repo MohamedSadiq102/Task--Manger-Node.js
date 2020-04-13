@@ -15,7 +15,7 @@ app.use(express.json())
 
 
 // to create & from2 1rgu , 1 for path, 2 for callback
-// this is endpoint
+// this is endpoint to create a User
 app.post('/users', (req , res) => {
    const user = new User(req.body)
 
@@ -29,6 +29,48 @@ app.post('/users', (req , res) => {
    })
 })
 
+// Endpoint to read from users
+app.get('/users', (req,res) => {
+    User.find({name : "Khfagy"}).then((user)=> {
+        res.send(user)
+    }).catch((e) =>{
+        res.status(500).send(e);
+    })
+})
+
+//Endpoint to read but more complexed
+// when i add /:id after users it means a dynamic value
+app.get('/users/:id', (req , res) => {
+    // req.params this contains all of the route parameters that we're provided
+   const _id =  req.params.id
+// monogodb query is not considered a failure if we don't get any result back, that's why we should use if statement
+   User.findById(_id).then((user) => {
+       if(!user){
+           return res.status(404).send()//404 user not found
+       }
+    res.send(user);
+   }).catch((e)=>{
+       res.status(500).send(e);
+   })
+
+})
+
+    app.get('/tasks/:id',(req,res) => {
+        const _id = req.params.id
+
+        Task.findById({_id},).then((task) => {
+            if(!task){
+                return res.status(404).send()
+            }
+            res.send(task)
+        }).catch((e) =>{
+            res.status(500).send()
+        })
+
+
+    })
+
+// Endpoint to create a task
 app.post('/tasks' ,(req,res) => {
    const task = new Task(req.body)
 
