@@ -12,17 +12,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api', {
 
 
 
-const Task = mongoose.model('Task',{
-    description : {
-       type: String,
-       trim:true,
-       required: true,
-    },
-        compeleted :  {
-        type : Boolean,
-        default:false
-    }
-})
 
 // const task = new Task ({
 //     description : '  Ko ks',
