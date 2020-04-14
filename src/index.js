@@ -31,7 +31,7 @@ app.post('/users', (req , res) => {
 
 // Endpoint to read from users
 app.get('/users', (req,res) => {
-    User.find({name : "Khfagy"}).then((user)=> {
+    User.find({name : "Mohamed Mostafa"}).then((user)=> {
         res.send(user)
     }).catch((e) =>{
         res.status(500).send(e);
@@ -66,8 +66,6 @@ app.get('/users/:id', (req , res) => {
         }).catch((e) =>{
             res.status(500).send()
         })
-
-
     })
 
 // Endpoint to create a task

@@ -5,7 +5,8 @@ const validator = require('validator')
 mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api', {
     useNewUrlParser:true,
     useCreateIndex: true ,// this make sure when mongo works with mongoose are in the same index to quickly access
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
 })
 
 
