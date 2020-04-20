@@ -7,7 +7,7 @@ const taskRouter = require('./routers/task')
 const app = express()
 // to see it in webpage
 app.use(userRouter)
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3000   
 
 // to customiye our server and express provides
 //express.json -> will automatically pass incoming Jason to an Object ,
@@ -33,11 +33,11 @@ const myFunction = async () => {
     // 2 will be easy to crack , 16 take a long time 
      const hashedPawword = await bycrypt.hash(password, 8)
 
-    //  console.log(password);
-    //  console.log(hashedPawword);
-    //  // when we're logging in we should match the passwords togother 
-    //  const isMatch = await bycrypt.compare('rot12345!',hashedPawword)
-    //  console.log(isMatch);
+     console.log(password);
+     console.log(hashedPawword);
+     // when we're logging in we should match the passwords togother 
+     const isMatch = await bycrypt.compare('rot12345!',hashedPawword)
+     console.log(isMatch);
      
      
 }
