@@ -10,22 +10,22 @@ const User = require('../models/user')
 router.post('/users', async (req , res) => {
      const user = new User(req.body)
  
-    // try {
-    //   // everything will be saved ot successed or failed 
-    //      await user.save()
-    //      res.status(201).send(user)
+    try {
+      // everything will be saved ot successed or failed 
+         await user.save()
+         res.status(201).send(user)
  
-    // }catch(e){
-    //   res.status(400).send(e)
-    // }
-    user.save().then(() =>{
-      //  without status we will see status code 200,despite it was created and should return 201
-       res.status(201).send(user)
-    }).catch((e) => {
-      // it tells that's client error, without this we will see status code 200,despite it was failed
-       res.status(400).send(e)
-     //  res.send(e)
-  })
+    }catch(e){
+      res.status(400).send(e)
+    }
+//     user.save().then(() =>{
+//       //  without status we will see status code 200,despite it was created and should return 201
+//        res.status(201).send(user)
+//     }).catch((e) => {
+//       // it tells that's client error, without this we will see status code 200,despite it was failed
+//        res.status(400).send(e)
+//      //  res.send(e)
+//   })
  
  })
 
