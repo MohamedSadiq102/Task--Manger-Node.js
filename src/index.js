@@ -5,15 +5,18 @@ const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task') 
 
 const app = express()
+app.use(express.json())
+
 // to see it in webpage
 app.use(userRouter)
+
 const port = process.env.PORT || 3000   
 
 // to customiye our server and express provides
 //express.json -> will automatically pass incoming Jason to an Object ,
 // so we can access it in our request handlers, make this console.log(req.body) in app.post
 // and when u make post from postman u will see it in terminal 
-app.use(express.json())
+//app.use(express.json())
 
 
 app.use(taskRouter)
