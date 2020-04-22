@@ -91,7 +91,7 @@ try{
 */
 router.patch('/tasks/:id', async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = [ 'description', 'compeleted']
+    const allowedUpdates = [ 'description', 'completed']
     const isValidOperations = updates.every((update) => allowedUpdates.includes(update))
     
     if(!isValidOperations ){
@@ -100,9 +100,8 @@ router.patch('/tasks/:id', async (req, res) => {
     
     try{
     //   const task = await Task.findByIdAndUpdate(req.params.id , req.body , {new : true , runValidators :true})
-    
+
        const task = await Task.findById(req.params.id)
-    
        updates.forEach((update) => task[update] = req.body[update])
        await task.save()
     
