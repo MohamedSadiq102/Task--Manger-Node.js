@@ -2,6 +2,7 @@
 const mongoose =require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 // thw pass objrct is defines all properties for that schema  
 const userSchema = new mongoose.Schema({
@@ -43,8 +44,25 @@ const userSchema = new mongoose.Schema({
                 throw new Error(' Email is invalid')
             }
         }
-     }
-    })
+     },
+     tokens : [{
+         token :{
+          type:  String,
+         required : true
+         } 
+     }]
+ })
+    // methode to accessible on instances methods
+    userSchema.methods.generateAuthToken = async function () {
+      const user = this
+      const token = jwt.sign({_id : user._id.toString()/**to convert that to standard String */ } , 'thisismynewcourse')
+      
+      user.tokens = user.tokens.concat({ token })
+      await user.save()
+
+      return token
+
+    }
   
 
     userSchema.statics.findbyCredentials = async (email, password) => {

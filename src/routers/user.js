@@ -1,6 +1,6 @@
 const express = require('express')
 const router = new express.Router()
-
+const auth = require('../middleware/auth')
 const User = require('../models/user')
 
 
@@ -13,7 +13,8 @@ router.post('/users', async (req , res) => {
     try {
       // everything will be saved ot successed or failed 
          await user.save()
-         res.status(201).send(user)
+         const token = await user.generateAuthToken()
+        res.status.send({ user , token})
  
     }catch(e){
       res.status(400).send(e)
@@ -33,15 +34,42 @@ router.post('/users', async (req , res) => {
     try {
         // credential -> taking email , password and find user by email & verfied the password
         const user = await User.findbyCredentials( req.body.email , req.body.password)
-        res.send(user)
+        //  we work with a collections & need generate a token for specific user & return a promise 
+        const token = await user.generateAuthToken()
+        res.send(/* send obj with 2 properity*/{ user , token})
     } catch (e) {
         console.log(e);
         res.status(400).send()
     }
 })
+router.post('/users/logoutAll', auth , async (req,res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+router.post('/users/logout', auth , async (req,res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token // if the current token isn't the one that was used for authentication 
+        })
+        await req.user.save()
 
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+        
+    }
+})
+
+router.get('/users/me', auth ,async (req,res) => {
+    res.send(req.user)
+})
 // Endpoint to read from users
-router.get('/users', async (req,res) => {
+router.get('/users', auth ,async (req,res) => {
 
     try{
         const users = await User.find({})
