@@ -3,7 +3,7 @@ const mongoose =require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-
+const Task = require('./task')
 // thw pass objrct is defines all properties for that schema  
 const userSchema = new mongoose.Schema({
      // each value from name , value now are object
@@ -52,6 +52,25 @@ const userSchema = new mongoose.Schema({
          } 
      }]
  })
+    // 2 argus -> name & set up an object
+    userSchema.virtual('tasks', {
+        ref: 'Task',
+        localField:'_id',
+        foreignField : 'owner'
+    })
+
+    //use the method to hide password in the body, if there is any other name except toJSON then we should but it in userhandler like user.anotther-name ()
+    userSchema.methods.toJSON = /** if i add async it will return empty user */ function () {
+    const user = this
+    const userObject = user.toObject()
+
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
+    
+    }
+
     // methode to accessible on instances methods
     userSchema.methods.generateAuthToken = async function () {
       const user = this
@@ -79,6 +98,7 @@ const userSchema = new mongoose.Schema({
         return user
     }
 
+
 // used a method on user schema to set the middleware up (there are pre and post) , hash password berfore saving
 // we are pass to arguments,1 is the name of the event, 2 is standard funct to run not a error-func
 userSchema.pre('save',async function (next) {
@@ -92,6 +112,12 @@ userSchema.pre('save',async function (next) {
     next()
 })
 
+// Delete user tasks when user removed
+userSchema.pre('remove', async function (next ){
+    const user = this
+    await Task.deleteMany({ owner : user._id})
+    next()
+})
 // monogoose.model accept 2 atgu , 1 -> for name , 2 -> defination for user || schema
 const User = mongoose.model('User', userSchema)
    

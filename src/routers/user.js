@@ -14,7 +14,7 @@ router.post('/users', async (req , res) => {
       // everything will be saved ot successed or failed 
          await user.save()
          const token = await user.generateAuthToken()
-        res.status.send({ user , token})
+        res.status(201).send({ user , token})
  
     }catch(e){
       res.status(400).send(e)
@@ -36,7 +36,7 @@ router.post('/users', async (req , res) => {
         const user = await User.findbyCredentials( req.body.email , req.body.password)
         //  we work with a collections & need generate a token for specific user & return a promise 
         const token = await user.generateAuthToken()
-        res.send(/* send obj with 2 properity*/{ user , token})
+        res.send({ user , token}) /* send obj with 2 properity*/
     } catch (e) {
         console.log(e);
         res.status(400).send()
@@ -116,7 +116,7 @@ router.get('/users/:id', async (req , res) => {
 })
 
     // Patch can only with id not all obejcts onetime
-    router.patch('/users/:id', async(req, res) =>{
+    router.patch('/users/me',auth ,async(req, res) =>{
         const updates = Object.keys(req.body) // take this Object in and return an array of Strings where each is property
         const allowedUpdates = ['name','email','password','age']
         // if every single update can be found in allowedupdates
@@ -132,34 +132,34 @@ router.get('/users/:id', async (req , res) => {
     try{
     //    const user = await User.findByIdAndUpdate(req.params.id,/**we don't have to put set because mongoose care about this */ /**{name : "Mohy"} || as body request*/ 
     //    req.body ,{new : true  /**ffor writing data in database */, runValidators : true }) /**this optional -> return new user as opposed to the existing one that was found before the update */ 
-       
-    const user = await User.findById(req.params.id) // only findbyid not with update because we don't have a spicifc parameter
+    
+    // const user = await User.findById(req.params.id) // only findbyid not with update because we don't have a spicifc parameter , after middleware auth not more used
+   
+     // i can't say user.name or  req.body.name ... because i don't know which filed is updated
+     // now is dynamic 
+    updates.forEach((update) => req.user[update] = req.body[update]) 
 
-      // i can't say user.name or  req.body.name ... because i don't know which filed is updated
-      // now is dynamic 
-    updates.forEach((update) => user[update] = req.body[update]) 
+     await req.user.save() // this the  where our middleware-methode is going to executed to save our changes
 
-     await user.save() // this the  where our middleware-methode is going to executed to save our changes
+    //    if (!user) { // we don't need it after middleware auth because he is already logged in
+    //        return res.status(404).send() // there is no user
+    //    }  
 
-       if (!user) {
-           return res.status(404).send() // there is no user
-       }  
-
-      res.status(201).send(user)
+      res.status(201).send(req.user)
      } catch(e){
         res.status(400).send(e)
     } 
 
 })
 
-router.delete('/users/:id', async (req,res)=> {
+router.delete('/users/me',auth ,async (req,res)=> {
     try {
-        const user = await User.findByIdAndDelete(req.params.id)
-        if(!user){
-            res.status(404).send()
-        }
-        res.status(200).send(user)
-        
+        // const user = await User.findByIdAndDelete(req.user._id)
+        // if(!user){
+        //     res.status(404).send()
+        // }
+        await req.user.remove()
+        res.status(200).send(req.user)
     } catch (e) {
         res.status(400).send(e)
     }
