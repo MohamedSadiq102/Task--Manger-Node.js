@@ -27,13 +27,31 @@ router.post('/tasks', auth, async (req, res) => {
     //    })
 })
 
+// Get /tasks?compeleted= true
+// Get /tasks?limit=10&skip=2
+// Get /tasks?sortBy=createdAt:des
 router.get('/tasks', auth, async (req, res) => {
+    const match ={}
+    const sort = {}
+
+    if(req.query.compeleted){
+        match.compeleted = req.query.compeleted === 'true'
+    }
+
     try {
-        //  const task = await Task.find({})
-        const task = await Task.find({
-            owner: req.user._id
-        })
-        res.status(200).send(task)
+        await req.user.populate({
+            path : 'tasks',
+            match,
+            options : {
+                limit: parseInt(req.query.limit),
+                skip : parseInt(req.query.skip),
+                sort
+                   // createdAt: -1  // sorted by time
+                  // compeleted: -1 // sorted by compelting -> descending
+            }
+        }).execPopulate()
+        res.send(req.user.tasks)
+       // res.status(200).send(task)
     } catch (e) {
         res.status(500).send(e)
     }

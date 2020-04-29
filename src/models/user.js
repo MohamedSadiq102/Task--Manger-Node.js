@@ -51,7 +51,11 @@ const userSchema = new mongoose.Schema({
          required : true
          } 
      }]
+ }, {
+     timestamps : true
  })
+
+
     // 2 argus -> name & set up an object
     userSchema.virtual('tasks', {
         ref: 'Task',
