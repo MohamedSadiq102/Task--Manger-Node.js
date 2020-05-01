@@ -38,6 +38,11 @@ router.get('/tasks', auth, async (req, res) => {
         match.compeleted = req.query.compeleted === 'true'
     }
 
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.spilt(':')
+        sort[parts[0]] =parts[1] ==='desc' ? -1 : 1
+    }
+
     try {
         await req.user.populate({
             path : 'tasks',
