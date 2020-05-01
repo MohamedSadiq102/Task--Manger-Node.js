@@ -1,4 +1,6 @@
 const express = require('express')
+const multer = require('multer') // to add file upload to express
+const sharp = require('sharp')
 const router = new express.Router()
 const auth = require('../middleware/auth')
 const User = require('../models/user')
@@ -162,6 +164,53 @@ router.delete('/users/me',auth ,async (req,res)=> {
         res.status(200).send(req.user)
     } catch (e) {
         res.status(400).send(e)
+    }
+})
+
+// configure multer multi times for another type of data
+const upload = multer({
+// dest : 'avatars', //destionation, to connect the image with user profile should remove dest because dest 'multer' run before callback
+    limits: { // to restrict the File size
+        fileSize: 1000000
+    },
+    fileFilter(req, file ,cb /**callback func */){ // to filter the files which we wan't actually to upload
+        if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
+            return cb(new Error('please upload a image with jpg Or jpeg Or png Format'))
+          }
+          cb(undefined, true) // accept upload
+         //   cb(undefined,false) // refuse the upload
+        //   cb(new Error('File must be a PDF')) // If error appears
+    }
+})
+
+router.post('/users/me/avatar', auth , upload.single('avatar'), async (req,res) => {
+   const buffer = await sharp(req.file.buffer).resize({width:250, height : 250}).png().toBuffer()
+   
+    req.user.avatar = buffer 
+    await req.user.save() // to use await don't forgett async
+    res.send()
+},(error, req, res, next) => {
+    res.status(400).send({error : error.message})
+})
+
+router.delete('/users/me/avatar', auth , async (req,res) => {
+    req.user.avatar = undefined
+    await req.user.save() // to use await don't forgett async
+    res.send()
+})
+
+router.get('/users/:id/avatar', async(req,res)=> {
+    try {
+        const user = await User.findById(req.params.id)
+
+        if (!user || !user.avatar) {
+            throw new Error()
+        }
+        
+        res.set( 'Content-Type', 'image/png')
+        res.status(404).send()
+    } catch (e) {
+        res.status(404).send()
     }
 })
 

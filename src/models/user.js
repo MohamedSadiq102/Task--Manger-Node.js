@@ -50,7 +50,10 @@ const userSchema = new mongoose.Schema({
           type:  String,
          required : true
          } 
-     }]
+     }],
+     avatar : {
+         type: Buffer  //allow us to store the buffer with our binary data in database
+     }
  }, {
      timestamps : true
  })
@@ -64,13 +67,14 @@ const userSchema = new mongoose.Schema({
     })
 
     //use the method to hide password in the body, if there is any other name except toJSON then we should but it in userhandler like user.anotther-name ()
-    userSchema.methods.toJSON = /** if i add async it will return empty user */ function () {
+    userSchema.methods.toJSON = function () { /** if i add async it will return empty user */ 
     const user = this
     const userObject = user.toObject()
 
     delete userObject.password
     delete userObject.tokens
-
+    delete userObject.avatar
+    
     return userObject
     
     }
