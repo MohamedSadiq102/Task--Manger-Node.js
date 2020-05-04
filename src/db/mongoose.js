@@ -2,15 +2,12 @@
 const mongoose =require('mongoose')
 const validator = require('validator')
 
-mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api', {
+mongoose.connect(process.env.MONGODB_URL, { // the data will store when we run only locally but with heroku not
     useNewUrlParser:true,
     useCreateIndex: true ,// this make sure when mongo works with mongoose are in the same index to quickly access
     useUnifiedTopology: true,
     useFindAndModify: false
 })
-
-
-
 
 
 

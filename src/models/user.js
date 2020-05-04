@@ -82,7 +82,7 @@ const userSchema = new mongoose.Schema({
     // methode to accessible on instances methods
     userSchema.methods.generateAuthToken = async function () {
       const user = this
-      const token = jwt.sign({_id : user._id.toString()/**to convert that to standard String */ } , 'thisismynewcourse')
+      const token = jwt.sign({_id : user._id.toString() } , process.env.JWT_SECRET) /**to convert that to standard String */
       
       user.tokens = user.tokens.concat({ token })
       await user.save()

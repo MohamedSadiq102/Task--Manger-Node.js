@@ -3,6 +3,7 @@ const multer = require('multer') // to add file upload to express
 const sharp = require('sharp')
 const router = new express.Router()
 const auth = require('../middleware/auth')
+const {sendWelcomeEmail , sendCancelEmail} = require('../emails/account')
 const User = require('../models/user')
 
 
@@ -15,6 +16,7 @@ router.post('/users', async (req , res) => {
     try {
       // everything will be saved ot successed or failed 
          await user.save()
+         sendWelcomeEmail(user.email, user.name)
          const token = await user.generateAuthToken()
         res.status(201).send({ user , token})
  
@@ -161,6 +163,7 @@ router.delete('/users/me',auth ,async (req,res)=> {
         //     res.status(404).send()
         // }
         await req.user.remove()
+        sendCancelEmail(req.user.email, req.user.name)
         res.status(200).send(req.user)
     } catch (e) {
         res.status(400).send(e)
