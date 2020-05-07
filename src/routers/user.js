@@ -149,7 +149,7 @@ router.get('/users/:id', async (req , res) => {
     //        return res.status(404).send() // there is no user
     //    }  
 
-      res.status(201).send(req.user)
+      res.status(200).send(req.user)
      } catch(e){
         res.status(400).send(e)
     } 
